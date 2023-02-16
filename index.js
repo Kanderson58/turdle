@@ -21,6 +21,9 @@ var errorMessage = document.querySelector('#error-message');
 var viewRulesButton = document.querySelector('#rules-button');
 var viewGameButton = document.querySelector('#play-button');
 var viewStatsButton = document.querySelector('#stats-button');
+var totalGames = document.querySelector('#stats-total-games');
+var percentCorrect = document.querySelector('#stats-percent-correct');
+var averageGuesses = document.querySelector('#stats-average-guesses');
 var gameBoard = document.querySelector('#game-section');
 var letterKey = document.querySelector('#key-section');
 var rules = document.querySelector('#rules-section');
@@ -172,8 +175,6 @@ function checkForWin() {
 function changeRow() {
   if(currentRow !== 6) {
     currentRow++;
-  } else {
-    console.log("loss")
   }
   updateInputPermissions();
 }
@@ -228,6 +229,17 @@ function clearKey() {
   }
 }
 
+const calcPercent = () => {
+  return (((gamesPlayed.filter(game => game.solved).length) / gamesPlayed.length) * 100);
+}
+
+const calcAverage = () => {
+  return (gamesPlayed.reduce((acc, cv) => {
+    acc += cv.guesses;
+    return acc
+  }, 0) / gamesPlayed.length);
+}
+
 // Change Page View Functions
 
 function viewRules() {
@@ -252,6 +264,11 @@ function viewGame() {
 }
 
 function viewStats() {
+  if(gamesPlayed.length) {
+    totalGames.innerText = gamesPlayed.length;
+    percentCorrect.innerText = calcPercent();
+    averageGuesses.innerText = calcAverage();
+  }
   letterKey.classList.add('hidden');
   gameBoard.classList.add('collapsed');
   rules.classList.add('collapsed');
