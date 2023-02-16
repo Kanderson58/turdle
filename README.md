@@ -8,7 +8,7 @@ This repo is associated with the [Refactor Tractor - 1 Day Challenge activity](h
 4. Open the app with `open index.html`
 
 [X] Iteration 1
-[ ] Iteration 2
+[X] Iteration 2
 [ ] Iteration 3
 [ ] Iteration 4
 [ ] Iteration 5

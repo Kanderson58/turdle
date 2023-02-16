@@ -3,12 +3,15 @@ var winningWord = '';
 var currentRow = 1;
 var guess = '';
 var gamesPlayed = [];
-var words;
+let words;
 
 // Fetch
 fetch("http://localhost:3001/api/v1/words")
-  .then(response => response.json())
-  .then(data => words = data)
+  .then((response) => response.json())
+  .then((data) => {
+    words = data
+    setGame();
+  });
 
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -27,8 +30,6 @@ var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 
 // Event Listeners
-window.addEventListener('load', setGame);
-
 for (var i = 0; i < inputs.length; i++) {
   inputs[i].addEventListener('keyup', function() { moveToNextInput(event) });
 }
@@ -72,10 +73,10 @@ function updateInputPermissions() {
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
 
-  if( key !== 8 && key !== 46 ) {
+  if( key !== 8 && key !== 46) {
     var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
     inputs[indexOfNext].focus();
-  }
+  } 
 }
 
 function clickLetter(e) {
@@ -99,8 +100,10 @@ function submitGuess() {
     compareGuess();
     if (checkForWin()) {
       setTimeout(declareWinner, 1000);
-    } else {
+    } else if (currentRow !== 6){
       changeRow();
+    } else {
+      declareLoser();
     }
   } else {
     errorMessage.innerText = 'Not a valid word. Try again!';
@@ -167,19 +170,30 @@ function checkForWin() {
 }
 
 function changeRow() {
-  currentRow++;
+  if(currentRow !== 6) {
+    currentRow++;
+  } else {
+    console.log("loss")
+  }
   updateInputPermissions();
 }
 
 function declareWinner() {
-  recordGameStats();
+  recordGameStats(true);
   changeGameOverText();
   viewGameOverMessage();
   setTimeout(startNewGame, 4000);
 }
 
-function recordGameStats() {
-  gamesPlayed.push({ solved: true, guesses: currentRow });
+const declareLoser = () => {
+  recordGameStats(false);
+  guessButton.classList.add('hidden');
+  errorMessage.innerText = `Sorry, you lost! The winning word was "${winningWord}"!`
+  setTimeout(startNewGame, 4000);
+}
+
+function recordGameStats(boolean) {
+  gamesPlayed.push({ solved: boolean, guesses: currentRow });
 }
 
 function changeGameOverText() {
@@ -192,6 +206,8 @@ function changeGameOverText() {
 }
 
 function startNewGame() {
+  guessButton.classList.remove('hidden');
+  errorMessage.innerText = '';
   clearGameBoard();
   clearKey();
   setGame();
